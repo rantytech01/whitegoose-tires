@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: whitegoose
+      POSTGRES_PASSWORD: whitegoose
+      POSTGRES_DB: whitegoose
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    ports: ["4000:4000"]
+    depends_on: [postgres, redis]
+
+  frontend:
+    build: ./frontend
+    env_file: ./frontend/.env.local
+    ports: ["3000:3000"]
+    depends_on: [backend]
+
+volumes:
+  pgdata:
