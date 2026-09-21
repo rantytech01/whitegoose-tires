@@ -15,6 +15,7 @@ import { Category } from "./category.entity";
 import { TireSpec } from "./tire-spec.entity";
 import { ProductImage } from "./product-image.entity";
 import { VehicleFitment } from "./vehicle-fitment.entity";
+import { numericTransformer } from "../../common/transformers/numeric.transformer";
 
 export type ProductCondition = "new" | "used";
 
@@ -50,10 +51,10 @@ export class Product {
   @Column({ type: "text", nullable: true })
   description: string | null;
 
-  @Column("numeric", { precision: 12, scale: 2 })
+  @Column("numeric", { precision: 12, scale: 2, transformer: numericTransformer })
   price: number;
 
-  @Column({ name: "discount_pct", type: "numeric", precision: 5, scale: 2, default: 0 })
+  @Column({ name: "discount_pct", type: "numeric", precision: 5, scale: 2, default: 0, transformer: numericTransformer })
   discountPct: number;
 
   @Column({ name: "is_active", default: true })

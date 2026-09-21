@@ -1,9 +1,12 @@
 import { Module } from "@nestjs/common";
-import { BranchesController } from "./branches.controller";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { AdminBranchesController, BranchesController } from "./branches.controller";
 import { BranchesService } from "./branches.service";
+import { Branch } from "../../database/entities/branch.entity";
 
 @Module({
-  controllers: [BranchesController],
+  imports: [TypeOrmModule.forFeature([Branch])],
+  controllers: [BranchesController, AdminBranchesController],
   providers: [BranchesService],
   exports: [BranchesService],
 })
