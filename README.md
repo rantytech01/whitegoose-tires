@@ -39,13 +39,26 @@ cd backend && npm run start:dev     # http://localhost:4000/api/v1
 cd frontend && npm run dev          # http://localhost:3000
 ```
 
+## Testing
+
+```bash
+cd backend
+npm test                # unit tests (phone/money/order-status/M-Pesa parsing)
+npm run typecheck
+
+# End-to-end checkout smoke test: needs a migrated Postgres. It boots the API
+# in-process and uses a fake Daraja server, so no Safaricom credentials are needed.
+DATABASE_URL=postgres://whitegoose:whitegoose@localhost:5432/whitegoose npm run migration:run
+npm run build && DATABASE_URL=... npm run smoke
+```
+
 ## Build order
 
 Follow section 5 ("Suggested Build Order") in `docs/database-and-api-design.md`:
 
-1. Auth + Products (read-only) → storefront browsing works
-2. Cart + Orders + Payments (M-Pesa first) → checkout works end-to-end
-3. Inventory + Branches → stock accuracy, multi-branch
+1. Auth + Products (read-only) → storefront browsing works — **done**
+2. Cart + Orders + Payments (M-Pesa first) → checkout works end-to-end — **backend done** (frontend wiring pending; card processor pending)
+3. Inventory + Branches → stock accuracy, multi-branch — **minimum done** (branches CRUD, stock adjust/list, reservation/release); suppliers, purchase orders, transfers pending
 4. Admin dashboard aggregate queries → reporting
 5. CRM + Support tickets
 

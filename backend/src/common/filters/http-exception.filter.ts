@@ -16,7 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
     const payload = exception instanceof HttpException ? exception.getResponse() : "Internal server error";
 
-    if (status >= 500) {
+    if (status >= 500 && status !== HttpStatus.NOT_IMPLEMENTED) {
       this.logger.error(`${request.method} ${request.url} -> ${status}`, exception instanceof Error ? exception.stack : String(exception));
     }
 

@@ -9,6 +9,7 @@ import { GoogleStrategy } from "./strategies/google.strategy";
 import { NotificationsStub } from "./notifications.stub";
 import { User } from "../../database/entities/user.entity";
 import { Role } from "../../database/entities/role.entity";
+import { Permission } from "../../database/entities/permission.entity";
 import { RefreshToken } from "../../database/entities/refresh-token.entity";
 import { PasswordResetToken } from "../../database/entities/password-reset-token.entity";
 
@@ -16,7 +17,9 @@ import { PasswordResetToken } from "../../database/entities/password-reset-token
   imports: [
     PassportModule,
     JwtModule.register({}),
-    TypeOrmModule.forFeature([User, Role, RefreshToken, PasswordResetToken]),
+    // Permission must be registered too: Role has a relation to it and autoLoadEntities
+    // only picks up entities that appear in some forFeature().
+    TypeOrmModule.forFeature([User, Role, Permission, RefreshToken, PasswordResetToken]),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, GoogleStrategy, NotificationsStub],

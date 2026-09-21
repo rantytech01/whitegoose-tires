@@ -96,7 +96,7 @@ export class PaymentsService {
         merchantRequestId: res.merchantRequestId,
       });
       return {
-        payment: this.view({ ...payment, checkoutRequestId: res.checkoutRequestId }),
+        payment: this.view(payment),
         customerMessage: res.customerMessage,
       };
     } catch (err: any) {

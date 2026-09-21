@@ -31,14 +31,14 @@ export class Product {
   @JoinColumn({ name: "category_id" })
   category: Category | null;
 
-  @Column({ name: "category_id", nullable: true })
+  @Column({ name: "category_id", type: "int", nullable: true })
   categoryId: number | null;
 
   @ManyToOne(() => Brand, { nullable: true, eager: true })
   @JoinColumn({ name: "brand_id" })
   brand: Brand | null;
 
-  @Column({ name: "brand_id", nullable: true })
+  @Column({ name: "brand_id", type: "int", nullable: true })
   brandId: number | null;
 
   @Index()

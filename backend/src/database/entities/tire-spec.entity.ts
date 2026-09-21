@@ -24,7 +24,7 @@ export class TireSpec {
   @Column({ name: "load_index", type: "smallint", nullable: true })
   loadIndex: number | null;
 
-  @Column({ name: "speed_rating", nullable: true })
+  @Column({ name: "speed_rating", type: "varchar", length: 3, nullable: true })
   speedRating: string | null;
 
   // Used tires only, e.g. 70 (%)
@@ -32,6 +32,6 @@ export class TireSpec {
   treadConditionPct: number | null;
 
   // 'all_season' | 'summer' | 'winter'
-  @Column({ nullable: true })
+  @Column({ type: "varchar", length: 12, nullable: true })
   season: string | null;
 }

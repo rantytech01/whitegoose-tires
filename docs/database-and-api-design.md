@@ -453,3 +453,37 @@ Conventions: JWT bearer auth (`Authorization: Bearer <token>`) with a 15-minute 
 3. Inventory + Branches → unlocks stock accuracy and multi-branch
 4. Admin dashboard aggregate queries → reporting
 5. CRM + Support tickets → last, lowest coupling to the rest
+
+---
+
+## 6. Implementation notes (steps 2–3, as built)
+
+Deviations from §2–3 and additions, in one place:
+
+**Schema**
+- `orders` stores `contact` and `delivery_address` as JSONB snapshots instead of `delivery_address_id` (supports guest checkout; survives profile edits). It also has `delivery_method` (`delivery|pickup`), `notes`, `idempotency_key` (unique) and `guest_token_hash`.
+- `order_items` snapshots `product_name` and `sku` alongside `unit_price`.
+- New `order_status_history` (customer-facing timeline + staff audit trail) and `order_number_seq` (order numbers `WG10000`, `WG10001`, …).
+- `payments` gains `phone`, `checkout_request_id` (unique), `merchant_request_id`, `failure_reason`, `raw_callback`, `updated_at`; a partial unique index stops one M-Pesa receipt settling two payments.
+- `carts` has partial unique indexes (one cart per customer / per guest session); `cart_items.saved_for_later` implements "save for later".
+- `inventory.quantity` has `CHECK (quantity >= 0)` as a last line of defence against overselling.
+- Order totals are rounded to whole KES (STK push only accepts integers).
+
+**API additions / changes**
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/orders` | Optional auth. `Idempotency-Key` header. Guests receive a one-time `guestToken` → send as `X-Order-Token` |
+| GET | `/orders/track?orderNumber=&phone=` | Public status lookup, no PII returned |
+| POST | `/orders/:id/pay` | `{method: mpesa\|cod\|bank_transfer\|card, phone?, reference?}`; card returns 501 |
+| GET | `/payments/:id` · POST `/payments/:id/verify` | Poll / ask Daraja directly (recovers lost callbacks) |
+| POST | `/webhooks/mpesa/callback/:secret` | Secret path segment authenticates Daraja (`MPESA_CALLBACK_SECRET`) |
+| PATCH | `/admin/orders/:id/status` | Forward-only state machine; cancelling restocks and flags `refundRequired` if already paid |
+| POST | `/admin/payments/:id/confirm` | Bank transfer received / cash banked |
+| PATCH | `/cart/items/:productId/save-for-later` | `{saved: boolean}` |
+| GET | `/admin/inventory/reorder-alerts` | |
+
+**Behaviour**
+- Stock is reserved at order creation from a single branch; unpaid orders are cancelled and restocked after `ORDER_PAYMENT_TTL_MINUTES` (bank transfers get `BANK_TRANSFER_TTL_HOURS`).
+- Guest carts are keyed by an httpOnly `wg_session` cookie (or `X-Cart-Session` for native clients) and merge into the customer's cart on the first authenticated request.
+- Domain events (`order.created`, `order.status_changed`, `payment.completed`, `payment.orphaned`) are emitted via `@nestjs/event-emitter` — notifications and the WebSocket gateway should subscribe rather than being called from services.
+- Known gaps: branch-scoped staff visibility (needs `staff_assignments`), refunds (flagged, not executed), card payments, throttler storage is per-process (move to Redis before running several API replicas).

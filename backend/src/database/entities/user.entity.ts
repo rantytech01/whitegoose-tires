@@ -19,11 +19,11 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ type: "varchar", length: 20, unique: true, nullable: true })
   phone: string | null;
 
   // Null for OAuth-only accounts (e.g. Google sign-in with no password set).
-  @Column({ name: "password_hash", nullable: true })
+  @Column({ name: "password_hash", type: "varchar", length: 255, nullable: true })
   passwordHash: string | null;
 
   @Column({ name: "full_name" })
@@ -35,7 +35,7 @@ export class User {
   @Column({ name: "mfa_enabled", default: false })
   mfaEnabled: boolean;
 
-  @Column({ name: "mfa_secret", nullable: true })
+  @Column({ name: "mfa_secret", type: "varchar", length: 255, nullable: true })
   mfaSecret: string | null;
 
   @Column({ name: "email_verified_at", type: "timestamptz", nullable: true })
@@ -46,13 +46,13 @@ export class User {
 
   // OTP handling — extension beyond the base schema doc (kept on the row
   // rather than a separate table since it's short-lived, single-purpose data).
-  @Column({ name: "otp_code_hash", nullable: true })
+  @Column({ name: "otp_code_hash", type: "varchar", length: 255, nullable: true })
   otpCodeHash: string | null;
 
   @Column({ name: "otp_expires_at", type: "timestamptz", nullable: true })
   otpExpiresAt: Date | null;
 
-  @Column({ name: "google_id", unique: true, nullable: true })
+  @Column({ name: "google_id", type: "varchar", length: 100, unique: true, nullable: true })
   googleId: string | null;
 
   @ManyToMany(() => Role, { eager: true })

@@ -15,10 +15,10 @@ export class VehicleFitment {
   @Column({ name: "product_id" })
   productId: string;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", length: 50, nullable: true })
   make: string | null;
 
-  @Column({ nullable: true })
+  @Column({ type: "varchar", length: 50, nullable: true })
   model: string | null;
 
   @Column({ name: "year_from", type: "smallint", nullable: true })

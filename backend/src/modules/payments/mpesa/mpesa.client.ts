@@ -28,7 +28,8 @@ export class MpesaClient {
   }
 
   private get baseUrl(): string {
-    return this.get("MPESA_ENV") === "production" ? "https://api.safaricom.co.ke" : "https://sandbox.safaricom.co.ke";
+    // MPESA_BASE_URL lets local dev/tests point at a fake Daraja instead of Safaricom's sandbox.
+    return this.get("MPESA_BASE_URL") || (this.get("MPESA_ENV") === "production" ? "https://api.safaricom.co.ke" : "https://sandbox.safaricom.co.ke");
   }
 
   isConfigured(): boolean {
